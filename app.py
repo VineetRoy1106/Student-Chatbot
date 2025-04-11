@@ -258,6 +258,7 @@ Focus on:
 5. Noting any scheduling constraints or capacity issues
 
 Keep your response concise yet personalized, and provide clear rationales for each recommendation.
+Do not sign off with your name.
 """
 
 # Streamlit UI
@@ -285,13 +286,23 @@ if query:
             gpa_fig, avg_term_gpa = plot_gpa_trend(student_id)
             gpa_trend, _ = analyze_gpa_trend(student_id)
             
-            # Recommend electives with actual GPA
+            # Filter out electives with Capacity_Issue not "OK"
+            filtered_electives = elective_schedule_df[elective_schedule_df["Capacity_Issue"] == "OK"]
+
             recommendations = recommend_electives(
                 strengths, 
                 completed_courses, 
-                elective_schedule_df.to_dict(orient="records"),
+                filtered_electives.to_dict(orient="records"),
                 actual_cum_gpa
             )
+
+            # Recommend electives with actual GPA
+            # recommendations = recommend_electives(
+            #     strengths, 
+            #     completed_courses, 
+            #     elective_schedule_df.to_dict(orient="records"),
+            #     actual_cum_gpa
+            # )
             
             # Prepare context for LLM
             top_strengths = {k: v["average"] for k, v in list(strengths.items())[:3]}
